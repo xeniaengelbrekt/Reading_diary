@@ -72,6 +72,28 @@ html,body{height:100%;overflow:hidden;background:#000;}
 @keyframes twinkle{0%,100%{opacity:var(--oa,.4)}50%{opacity:var(--ob,.9)}}
 #stars-bg{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .8s;}
 .t2 #stars-bg{opacity:1;}
+/* Forest leaves */
+#deco{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.t0 #deco::before{content:'';position:absolute;top:-20px;right:-20px;width:150px;height:150px;
+  background:radial-gradient(ellipse 7px 26px at 125px 22px,rgba(60,140,80,.2) 0%,transparent 100%),
+    radial-gradient(ellipse 6px 20px at 142px 48px,rgba(60,140,80,.15) 0%,transparent 100%),
+    radial-gradient(ellipse 7px 24px at 112px 52px,rgba(60,140,80,.15) 0%,transparent 100%),
+    radial-gradient(ellipse 5px 17px at 150px 72px,rgba(60,140,80,.11) 0%,transparent 100%),
+    radial-gradient(ellipse 6px 19px at 100px 70px,rgba(60,140,80,.12) 0%,transparent 100%);
+  transform:rotate(-8deg);}
+.t0 #deco::after{content:'';position:absolute;bottom:-15px;left:-15px;width:110px;height:110px;
+  background:radial-gradient(ellipse 6px 21px at 18px 75px,rgba(60,140,80,.16) 0%,transparent 100%),
+    radial-gradient(ellipse 5px 17px at 35px 90px,rgba(60,140,80,.12) 0%,transparent 100%),
+    radial-gradient(ellipse 5px 19px at 6px 58px,rgba(60,140,80,.11) 0%,transparent 100%);
+  transform:rotate(22deg);}
+/* Sea shimmer */
+.t1 #deco::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(56,188,238,.08) 20%,rgba(56,188,238,.24) 40%,rgba(56,188,238,.08) 60%,rgba(56,188,238,.18) 78%,transparent 100%);
+  animation:wv 6s ease-in-out infinite;}
+.t1 #deco::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(56,188,238,.07) 30%,rgba(56,188,238,.18) 55%,rgba(56,188,238,.07) 78%,transparent 100%);
+  animation:wv 8s ease-in-out infinite reverse;}
+@keyframes wv{0%,100%{opacity:.55;transform:scaleX(1);}50%{opacity:1;transform:scaleX(1.03);}}
 
 /* ════ HEADER ════ */
 #hdr{
@@ -220,7 +242,7 @@ html,body{height:100%;overflow:hidden;background:#000;}
 .bcard:active{background:rgba(var(--acr),.12);}
 .bnk{min-width:18px;font-family:'Playfair Display',serif;font-size:14px;color:var(--dim);font-weight:700;flex-shrink:0;}
 .bi{flex:1;min-width:0;}
-.bt{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35;}
+.bt{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35;}
 .ba{font-size:11px;font-weight:500;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .bsc{min-width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:12px;font-weight:700;flex-shrink:0;}
 
@@ -237,7 +259,7 @@ html,body{height:100%;overflow:hidden;background:#000;}
 /* Best book */
 .best{background:rgba(var(--acr),.08);border:1.5px solid rgba(var(--acr),.2);border-radius:14px;padding:13px 15px;margin-bottom:14px;}
 .best-tag{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:5px;}
-.best-title{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:3px;}
+.best-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--text);line-height:1.3;margin-bottom:3px;}
 .best-auth{font-size:11px;font-weight:500;color:var(--sub);}
 
 /* Bar chart */
@@ -257,7 +279,7 @@ html,body{height:100%;overflow:hidden;background:#000;}
 
 /* Author row */
 .ar{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--card);border:1px solid var(--brd);border-radius:13px;margin-bottom:6px;}
-.an{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:10px;}
+.an{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:10px;}
 .am{display:flex;gap:7px;align-items:center;flex-shrink:0;}
 .ab{background:rgba(var(--acr),.16);border:1px solid rgba(var(--acr),.28);border-radius:10px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--ac);}
 .aa{font-family:'Playfair Display',serif;font-weight:700;font-size:14px;color:var(--gold);}
@@ -289,12 +311,12 @@ html,body{height:100%;overflow:hidden;background:#000;}
 .tbr-btn:active{background:rgba(var(--acr),.12);}
 
 /* Top-10 count */
-.tcnt{font-size:11px;color:var(--sub);text-align:center;margin-bottom:12px;font-style:italic;font-weight:500;}
+.tcnt{font-size:11px;color:var(--sub);text-align:center;margin-bottom:12px;font-weight:500;}
 
 /* Empty */
 .empty{text-align:center;padding:60px 20px 20px;}
 .eico{font-size:42px;opacity:.28;margin-bottom:14px;}
-.etxt{font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:var(--dim);}
+.etxt{font-family:'Playfair Display',serif;font-size:16px;color:var(--dim);}
 .esub{font-size:12px;color:var(--dim);margin-top:7px;font-weight:500;opacity:.6;}
 
 /* Divider */
@@ -309,6 +331,7 @@ html,body{height:100%;overflow:hidden;background:#000;}
 
   <!-- Stars (cosmos theme) -->
   <div id="stars-bg"></div>
+  <div id="deco"></div>
 
   <!-- Header -->
   <div id="hdr">
@@ -380,7 +403,7 @@ html,body{height:100%;overflow:hidden;background:#000;}
 // ══════════════════════════════════════════════════════
 const THEMES=[{n:'лес',i:'🌲',c:'t0'},{n:'море',i:'🌊',c:'t1'},{n:'космос',i:'🌌',c:'t2'}];
 const MO=["январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"];
-const RATINGS=[3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8,8.5,9,9.5,10];
+const RATINGS=[10,9.5,9,8.5,8,7.5,7,6.5,6,5.5,5,4.5,4,3.5,3,2.5,2,1.5,1];
 
 let books=[],curTab=0,curMonth=null,curExp=0,curSort=0,searchQ='',curTheme=0;
 let editId=null,draftRating=8,draftMonth='';
@@ -509,7 +532,7 @@ function renderExp(){
     const one=top.filter(a=>a.n===1), multi=top.filter(a=>a.n>=2);
     const renderRow=a=>`<div class="ar"><span class="an">${esc(a.name)}</span><div class="am"><span class="ab">${a.n} ${a.n===1?'книга':a.n>=2&&a.n<=4?'книги':'книг'}</span><span class="aa">${a.avg.toFixed(1)}</span></div></div>`;
     body=top.length
-      ?`${multi.length?sh('от 2 книг')+''+multi.map(renderRow).join(''):''}${one.length?sh('1 книга')+''+one.map(renderRow).join(''):''}`
+      ?`${sh('по средней оценке')}${top.map(renderRow).join('')}`
       :`${empty('Пока нет книг')}`;
   }
   if(curExp===2){
