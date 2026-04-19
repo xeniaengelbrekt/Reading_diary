@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Читательский дневник</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* === ПАЛИТРА: КОСМОС (по умолчанию) === */
+  :root {
+    --bg-0: #07051a;
+    --bg-1: #140a2e;
+    --bg-2: #241548;
+    --card: rgba(32, 20, 62, 0.62);
+    --card-solid: #1a0f38;
+    --border: rgba(212, 196, 255, 0.14);
+    --border-strong: rgba(212, 196, 255, 0.3);
+    --text: #ece0ff;
+    --text-dim: #c4b4dc;
+    --muted: #908aab;
+    --primary: #d4c4ff;       /* звёздный свет */
+    --primary-soft: #b8a0e8;
+    --secondary: #9d7bd4;     /* фиолет */
+    --secondary-soft: #7a5eb0;
+    --tertiary: #e8a8d4;      /* роза туманности */
+    --danger: #e67a7a;
+    --nebula-1: rgba(157, 123, 212, 0.6);
+    --nebula-2: rgba(232, 168, 212, 0.45);
+    --primary-glow: rgba(212, 196, 255, 0.5);
+    --secondary-glow: rgba(157, 123, 212, 0.35);
+  }
+
+  /* === ЛЕС === */
+  body.theme-forest {
+    --bg-0: #050a07;
+    --bg-1: #0c1a10;
+    --bg-2: #192a1e;
+    --card: rgba(28, 46, 32, 0.55);
+    --card-solid: #142118;
+    --border: rgba(180, 210, 170, 0.16);
+    --border-strong: rgba(180, 210, 170, 0.32);
+    --text: #eaefd8;
+    --text-dim: #c4ceae;
+    --muted: #889078;
+    --primary: #d4c26a;       /* тёплый янтарь / солнце сквозь листву */
+    --primary-soft: #b8a850;
+    --secondary: #8dc997;     /* шалфей */
+    --secondary-soft: #6eaa78;
+    --tertiary: #c4d8a0;      /* молодой лист */
+    --danger: #d88878;
+    --nebula-1: rgba(141, 201, 151, 0.45);
+    --nebula-2: rgba(196, 216, 160, 0.32);
+    --primary-glow: rgba(212, 194, 106, 0.4);
+    --secondary-glow: rgba(141, 201, 151, 0.3);
+  }
+
+  /* === ГЛИТЧ === */
+  body.theme-glitch {
+    --bg-0: #020408;
+    --bg-1: #080a14;
+    --bg-2: #0f1220;
+    --card: rgba(18, 24, 40, 0.72);
+    --card-solid: #0c1020;
+    --border: rgba(0, 232, 232, 0.16);
+    --border-strong: rgba(0, 232, 232, 0.32);
+    --text: #e4f0f0;
+    --text-dim: #b0c4c8;
+    --muted: #728088;
+    --primary: #00e8e8;        /* cyan */
+    --primary-soft: #00b8c8;
+    --secondary: #e040b8;      /* magenta */
+    --secondary-soft: #b02898;
+    --tertiary: #ffd24a;       /* amber */
+    --danger: #ff4848;
+    --nebula-1: rgba(224, 64, 184, 0.38);
+    --nebula-2: rgba(0, 232, 232, 0.3);
+    --primary-glow: rgba(0, 232, 232, 0.4);
+    --secondary-glow: rgba(224, 64, 184, 0.32);
+  }
+
+  /* === Декоративные фоны тем === */
+
+  /* ЛЕС — силуэты папоротников, тилингом */
+  body.theme-forest::before {
+    content: ''; position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background-image: url("data:image/svg+xml;charset=utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='340' viewBox='0 0 260 340'><g stroke='%238dc997' stroke-opacity='0.09' stroke-width='1' fill='none' stroke-linecap='round'><g><path d='M60 300 Q 65 200 60 100 Q 55 40 60 10'/><path d='M60 280 Q 40 260 20 250'/><path d='M60 240 Q 35 220 15 200'/><path d='M60 200 Q 40 184 25 170'/><path d='M60 160 Q 42 145 30 130'/><path d='M60 120 Q 48 108 40 100'/><path d='M60 80 Q 52 72 46 68'/><path d='M60 280 Q 80 260 100 250'/><path d='M60 240 Q 85 220 105 200'/><path d='M60 200 Q 80 184 95 170'/><path d='M60 160 Q 78 145 90 130'/><path d='M60 120 Q 72 108 80 100'/><path d='M60 80 Q 68 72 74 68'/></g><g transform='translate(140 40) rotate(18) scale(0.8)'><path d='M60 300 Q 65 200 60 100 Q 55 40 60 10'/><path d='M60 260 Q 38 240 18 228'/><path d='M60 220 Q 34 200 14 184'/><path d='M60 180 Q 38 164 22 150'/><path d='M60 140 Q 42 126 28 114'/><path d='M60 100 Q 50 90 42 82'/><path d='M60 260 Q 82 240 102 228'/><path d='M60 220 Q 86 200 106 184'/><path d='M60 180 Q 82 164 98 150'/><path d='M60 140 Q 78 126 92 114'/><path d='M60 100 Q 70 90 78 82'/></g></g></svg>");
+    background-repeat: repeat;
+  }
+
+  /* ГЛИТЧ — сканлинии в фоне + RGB-сдвиг в заголовке */
+  body.theme-glitch {
+    background:
+      repeating-linear-gradient(to bottom,
+        transparent 0, transparent 2px,
+        rgba(0, 232, 232, 0.04) 2px, rgba(0, 232, 232, 0.04) 3px),
+      radial-gradient(ellipse at top, var(--bg-2) 0%, var(--bg-1) 35%, var(--bg-0) 100%);
+    background-attachment: fixed;
+  }
+  body.theme-glitch::before {
+    content: ''; position: fixed; inset: 0;
+    pointer-events: none; z-index: 2;
+    background: repeating-linear-gradient(to bottom,
+      transparent 0, transparent 3px,
+      rgba(255, 0, 170, 0.03) 3px, rgba(255, 0, 170, 0.03) 4px);
+    mix-blend-mode: screen;
+  }
+
+  /* Звёзды/туманности: видимость по темам */
+  body.theme-forest .starfield,
+  body.theme-glitch .starfield { display: none; }
+  body.theme-glitch .nebula { display: none; }
+
+  /* Глитч — RGB-сдвиг в заголовке */
+  body.theme-glitch header h1 {
+    background: none;
+    -webkit-background-clip: unset; background-clip: unset;
+    -webkit-text-fill-color: #e4f0f0; color: #e4f0f0;
+    text-shadow: -2px 0 rgba(224, 64, 184, 0.85), 2px 0 rgba(0, 232, 232, 0.85);
+    letter-spacing: 2px;
+  }
+
+  html, body { min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+    font-size: 15px; line-height: 1.55;
+    color: var(--text);
+    background: radial-gradient(ellipse at top, var(--bg-2) 0%, var(--bg-1) 35%, var(--bg-0) 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.3s;
+  }
+
+  /* Звёздный фон */
+  .starfield { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .starfield .star {
+    position: absolute; background: white; border-radius: 50%;
+    animation: twinkle infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+  .nebula {
+    position: fixed; pointer-events: none; z-index: 0;
+    filter: blur(60px); opacity: 0.35;
+    transition: background 0.4s;
+  }
+  .nebula.one {
+    top: -100px; right: -100px; width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--nebula-1), transparent 70%);
+  }
+  .nebula.two {
+    bottom: -150px; left: -100px; width: 450px; height: 450px;
+    background: radial-gradient(circle, var(--nebula-2), transparent 70%);
+  }
+
+  h1, h2, h3 {
+    font-family: Georgia, 'Cormorant Garamond', 'Times New Roman', serif;
+    font-weight: 400; letter-spacing: 0.3px;
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 1200px; margin: 0 auto;
+    padding: 40px 24px 120px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 42px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--tertiary) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 1px;
+  }
+
+  /* Вкладки */
+  nav.tabs {
+    display: flex; gap: 4px;
+    margin-bottom: 32px;
+    flex-wrap: wrap; justify-content: center;
+    border-bottom: 1px solid var(--border);
+  }
+  nav.tabs button {
+    background: none; border: none; font: inherit;
+    font-size: 15px; padding: 12px 22px;
+    cursor: pointer; color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.3px;
+  }
+  nav.tabs button:hover { color: var(--text-dim); }
+  nav.tabs button.active {
+    color: var(--primary); border-bottom-color: var(--primary);
+  }
+
+  .tab-content { display: none; animation: fade 0.3s; }
+  .tab-content.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* Формы */
+  form { display: grid; gap: 20px; max-width: 600px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  label {
+    font-size: 13px; color: var(--text-dim); font-weight: 500;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  label .req { color: var(--primary); margin-left: 2px; }
+
+  input[type="text"], input[type="month"], input[type="date"], select {
+    font: inherit; font-size: 15px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px; color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus {
+    outline: none; border-color: var(--secondary);
+    box-shadow: 0 0 0 3px var(--secondary-glow);
+  }
+  input[type="month"]::-webkit-calendar-picker-indicator,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.8); cursor: pointer;
+  }
+
+  .no-date {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-dim);
+    cursor: pointer; text-transform: none; letter-spacing: normal;
+  }
+  .no-date input { cursor: pointer; accent-color: var(--secondary); }
+
+  /* Слайдер */
+  .rating-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px;
+  }
+  .rating-display { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+  .rating-display .num {
+    font-family: Georgia, serif; font-size: 36px;
+    color: var(--primary); font-weight: 400;
+    text-shadow: 0 0 20px var(--primary-glow);
+  }
+  .rating-display .out { color: var(--muted); font-size: 16px; }
+
+  input[type="range"] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    background: transparent; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    border-radius: 3px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 6px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    border-radius: 3px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--primary) 70%);
+    border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px var(--primary-glow);
+    margin-top: -8px; cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    background: radial-gradient(circle at 30% 30%, #fff, var(--primary) 70%);
+    border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px var(--primary-glow);
+    cursor: pointer;
+  }
+
+  /* Кнопки */
+  button.primary {
+    background: linear-gradient(135deg, var(--secondary-soft), var(--secondary));
+    color: white; border: none;
+    padding: 13px 28px; font: inherit; font-size: 15px; font-weight: 500;
+    border-radius: 8px; cursor: pointer; letter-spacing: 0.5px;
+    transition: transform 0.15s, box-shadow 0.2s;
+    justify-self: start;
+    box-shadow: 0 4px 16px var(--secondary-glow);
+  }
+  button.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 22px var(--secondary-glow);
+  }
+  button.secondary {
+    background: transparent; color: var(--text-dim);
+    border: 1px solid var(--border-strong);
+    padding: 10px 18px; font: inherit; font-size: 14px;
+    border-radius: 8px; cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  button.secondary:hover { color: var(--primary); border-color: var(--primary); }
+
+  /* Плавающие кнопки */
+  .fab-stack {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    display: flex; flex-direction: column; gap: 12px;
+    align-items: center;
+    z-index: 50;
+  }
+  .fab {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--secondary-soft), var(--secondary));
+    border: none; color: white;
+    font-size: 30px; font-weight: 300; line-height: 1;
+    cursor: pointer; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px var(--secondary-glow), 0 0 30px var(--secondary-glow);
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .fab:hover { transform: scale(1.08); }
+  .fab:active { transform: scale(0.96); }
+  .fab.settings {
+    background: var(--card-solid);
+    border: 1px solid var(--border-strong);
+    color: var(--text-dim);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  }
+  .fab.settings:hover { color: var(--primary); border-color: var(--primary); }
+  .fab.settings svg { width: 22px; height: 22px; }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex; gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; align-items: center;
+  }
+  .toolbar input, .toolbar select { padding: 10px 14px; font-size: 14px; }
+  .toolbar .search { flex: 1; min-width: 220px; }
+  .counter { color: var(--muted); font-size: 13px; letter-spacing: 0.3px; }
+
+  /* Таблицы */
+  .table-wrap {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+  }
+  thead th {
+    text-align: left;
+    padding: 14px 16px;
+    color: var(--text-dim); font-weight: 500;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    font-size: 11px;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  thead th.num { text-align: right; }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(180, 170, 230, 0.05); }
+
+  td.title { color: var(--text); font-weight: 500; word-break: break-word; }
+  td.author { color: var(--secondary); font-style: italic; word-break: break-word; }
+  td.rating {
+    font-family: Georgia, serif; color: var(--primary);
+    font-size: 17px; text-align: right; white-space: nowrap;
+    text-shadow: 0 0 8px var(--primary-glow);
+  }
+  td.num { text-align: right; font-family: Georgia, serif; font-size: 16px; color: var(--text); white-space: nowrap; }
+  td.date { color: var(--muted); font-size: 13px; white-space: nowrap; }
+  td.actions { text-align: right; white-space: nowrap; }
+  td.actions button {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font: inherit; font-size: 12px;
+    padding: 5px 10px; border-radius: 5px;
+    cursor: pointer; margin-left: 4px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  td.actions button:hover { color: var(--primary); border-color: var(--primary); }
+  td.actions button.del:hover { color: var(--danger); border-color: var(--danger); }
+
+  .empty-state {
+    text-align: center; padding: 80px 20px; color: var(--muted);
+  }
+  .empty-state h3 {
+    font-size: 24px; margin-bottom: 10px; color: var(--text-dim);
+  }
+
+  /* Статистика */
+  .stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 18px; text-align: center;
+  }
+  .stat-card .value {
+    font-family: Georgia, serif; font-size: 42px; display: block;
+    background: linear-gradient(135deg, var(--primary), var(--tertiary));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1; margin-bottom: 6px;
+  }
+  .stat-card .label {
+    color: var(--muted); font-size: 13px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+
+  .stats-controls {
+    display: flex; gap: 16px;
+    align-items: center; flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .stats-controls label {
+    font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .stats-controls select { padding: 8px 14px; font-size: 14px; }
+
+  .chart-section {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px; margin-bottom: 22px;
+  }
+  .chart-section h3 { font-size: 22px; color: var(--text); }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 10px;
+  }
+  .chart-legend {
+    display: flex; gap: 16px; font-size: 12px;
+    color: var(--muted); flex-wrap: wrap;
+  }
+  .chart-legend .item { display: flex; align-items: center; gap: 6px; }
+  .chart-legend .swatch-range {
+    width: 12px; height: 12px;
+    background: linear-gradient(to top, var(--secondary-soft), var(--primary));
+    border-radius: 2px;
+  }
+  .chart-legend .swatch-avg {
+    width: 14px; height: 3px;
+    background: #fff; box-shadow: 0 0 4px #fff;
+  }
+
+  /* Столбиковый график */
+  .bar-chart-wrap {
+    display: grid; grid-template-columns: 36px 1fr; gap: 10px;
+  }
+  .bar-chart-wrap .y-labels {
+    position: relative; height: 320px;
+    font-size: 11px; color: var(--muted);
+  }
+  .bar-chart-wrap .y-labels span {
+    position: absolute; right: 0; transform: translateY(-50%);
+  }
+  .bar-chart {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px;
+    align-items: end; height: 320px; position: relative;
+    background-image: linear-gradient(to bottom,
+      transparent 0, transparent 49.5%,
+      rgba(180, 170, 230, 0.08) 49.5%, rgba(180, 170, 230, 0.08) 50.5%,
+      transparent 50.5%);
+  }
+  .bar-chart .bar-col {
+    display: flex; flex-direction: column; align-items: center;
+    height: 100%; justify-content: end; position: relative;
+  }
+  .bar-chart .bar-col.clickable { cursor: pointer; }
+  .bar-chart .bar-col.clickable:hover .bar { filter: brightness(1.25); }
+  .bar-chart .bar {
+    width: 70%;
+    background: linear-gradient(to top, var(--secondary-soft), var(--primary));
+    border-radius: 4px 4px 0 0;
+    min-height: 2px; position: relative;
+    transition: filter 0.15s;
+    box-shadow: 0 0 12px var(--secondary-glow);
+  }
+  .bar-chart .bar-value {
+    position: absolute; top: -22px;
+    font-size: 13px; color: var(--primary); font-weight: 500;
+    left: 50%; transform: translateX(-50%);
+  }
+
+  /* График диапазонов */
+  .range-chart-wrap {
+    display: grid; grid-template-columns: 36px 1fr; gap: 10px;
+  }
+  .range-chart-wrap .y-labels {
+    position: relative; height: 320px;
+    font-size: 11px; color: var(--muted);
+  }
+  .range-chart-wrap .y-labels span {
+    position: absolute; right: 0; transform: translateY(-50%);
+  }
+  .range-cols {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px;
+    height: 320px; position: relative;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(180, 170, 230, 0.08) 0,
+      rgba(180, 170, 230, 0.08) 1px,
+      transparent 1px,
+      transparent calc(100% / 9 * 2)
+    );
+  }
+  .range-col { position: relative; height: 100%; }
+  .range-col.clickable { cursor: pointer; }
+  .range-col.clickable:hover .rc-range { filter: brightness(1.25); }
+  .range-col .rc-range {
+    position: absolute; left: 20%; right: 20%;
+    background: linear-gradient(to top, var(--secondary-soft), var(--primary));
+    border-radius: 3px; min-height: 3px;
+    box-shadow: 0 0 10px var(--secondary-glow);
+    transition: filter 0.15s;
+  }
+  .range-col .rc-avg {
+    position: absolute; left: 10%; right: 10%;
+    height: 2px; background: #fff;
+    box-shadow: 0 0 4px #fff, 0 0 10px var(--primary);
+    z-index: 2; transform: translateY(-1px);
+  }
+  .range-col .rc-avg-label {
+    position: absolute; right: 0;
+    font-size: 11px; color: var(--primary);
+    font-family: Georgia, serif;
+    transform: translate(calc(100% + 6px), -50%);
+    white-space: nowrap; opacity: 0;
+    transition: opacity 0.15s;
+    background: var(--bg-1);
+    padding: 2px 6px; border-radius: 4px;
+    border: 1px solid var(--border); z-index: 3;
+  }
+  .range-col:hover .rc-avg-label { opacity: 1; }
+
+  .month-row {
+    display: grid; grid-template-columns: 36px 1fr; gap: 10px;
+    margin-top: 6px;
+  }
+  .month-row .months {
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px;
+  }
+  .month-row .months span {
+    text-align: center; font-size: 12px; color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .month-row .months span.clickable {
+    cursor: pointer; transition: color 0.15s;
+  }
+  .month-row .months span.clickable:hover { color: var(--primary); }
+
+  /* Месяц-вкладки */
+  .month-tabs {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 4px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .month-tabs button {
+    background: none;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font: inherit; font-size: 13px;
+    padding: 8px 4px;
+    cursor: pointer; border-radius: 8px;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    min-width: 0;
+  }
+  .month-tabs button:hover {
+    color: var(--text-dim);
+    background: rgba(180, 170, 230, 0.05);
+  }
+  .month-tabs button.active {
+    color: var(--primary);
+    background: rgba(255, 217, 138, 0.06);
+    border-color: var(--border-strong);
+    box-shadow: 0 0 16px rgba(255, 217, 138, 0.08);
+  }
+  .month-tabs button.empty { color: rgba(139, 132, 168, 0.45); }
+  .month-tabs button .mt-name {
+    letter-spacing: 0.4px;
+    text-transform: lowercase;
+  }
+  .month-tabs button .mt-count {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: Georgia, serif;
+  }
+  .month-tabs button.active .mt-count { color: var(--primary); }
+  @media (max-width: 650px) {
+    .month-tabs { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+
+  .md-title {
+    font-family: Georgia, serif;
+    font-size: 24px; color: var(--text);
+    margin-bottom: 18px;
+  }
+  .empty-inline {
+    padding: 40px 20px; text-align: center;
+    color: var(--muted);
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+  }
+
+  .month-stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px; margin-bottom: 24px;
+  }
+  @media (max-width: 700px) {
+    .month-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 420px) {
+    .month-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  /* Таблица в детали месяца — фиксированные пропорции колонок,
+     чтобы макет не менялся при разных книгах */
+  #month-detail table { table-layout: fixed; }
+  #month-detail th:nth-child(1), #month-detail td:nth-child(1) { width: 58%; }
+  #month-detail th:nth-child(2), #month-detail td:nth-child(2) { width: 30%; }
+  #month-detail th:nth-child(3), #month-detail td:nth-child(3) { width: 12%; }
+  .month-stats .stat {
+    text-align: center;
+    padding: 12px 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .month-stats .stat .v {
+    font-family: Georgia, serif; font-size: 22px;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary-glow);
+  }
+  .month-stats .stat .l {
+    font-size: 10px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* Распределение */
+  .rating-dist { display: flex; flex-direction: column; gap: 7px; }
+  .rating-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 40px;
+    gap: 14px; align-items: center;
+  }
+  .rating-row .label-num {
+    font-family: Georgia, serif;
+    color: var(--primary); font-size: 14px; text-align: right;
+  }
+  .rating-bar-bg {
+    background: rgba(180, 170, 230, 0.08);
+    height: 18px; border-radius: 4px; overflow: hidden;
+  }
+  .rating-bar-fill-dist {
+    background: linear-gradient(90deg, var(--secondary), var(--primary));
+    height: 100%; border-radius: 4px; min-width: 2px;
+    transition: width 0.4s;
+    box-shadow: 0 0 8px var(--secondary-glow);
+  }
+  .rating-row .count {
+    text-align: right; color: var(--text-dim); font-size: 13px;
+  }
+
+  /* Модалки */
+  .modal-bg {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 100;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.active { display: flex; }
+  .modal {
+    position: relative;
+    background: var(--card-solid);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 32px;
+    max-width: 700px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--secondary-glow);
+  }
+  .modal h2 {
+    margin-bottom: 24px; color: var(--primary); font-size: 28px;
+  }
+  .modal h3.section-title {
+    font-size: 16px; color: var(--text-dim);
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin: 24px 0 12px; font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .modal h3.section-title:first-of-type { margin-top: 0; }
+  .modal-close-btn {
+    position: absolute; top: 16px; right: 16px;
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer;
+    width: 32px; height: 32px; border-radius: 50%;
+    font: inherit; font-size: 18px; line-height: 1;
+  }
+  .modal-close-btn:hover { color: var(--primary); border-color: var(--primary); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+  /* Настройки — сетка тем */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .theme-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, background 0.15s;
+    font: inherit; color: var(--text);
+    text-align: left;
+  }
+  .theme-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-2px);
+  }
+  .theme-card.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 16px var(--primary-glow);
+  }
+  .theme-preview {
+    display: flex; gap: 4px;
+    margin-bottom: 10px;
+    height: 28px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .theme-preview span {
+    flex: 1;
+  }
+  .theme-name {
+    font-size: 14px; color: var(--text);
+    letter-spacing: 0.3px;
+  }
+  .theme-card.active .theme-name { color: var(--primary); }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 120px;
+    left: 50%; transform: translateX(-50%) translateY(150px);
+    background: linear-gradient(135deg, var(--secondary-soft), var(--secondary));
+    color: white; padding: 14px 26px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px var(--secondary-glow);
+    transition: transform 0.3s; z-index: 200;
+    font-size: 14px; letter-spacing: 0.3px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Скроллбар */
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-0); }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(180, 170, 230, 0.2); border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(180, 170, 230, 0.4); }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px 100px; }
+    header h1 { font-size: 32px; }
+    nav.tabs button { padding: 10px 14px; font-size: 14px; }
+    thead th, tbody td { padding: 10px 10px; font-size: 13px; }
+    td.actions button { padding: 4px 8px; }
+    .fab-stack { bottom: 20px; right: 20px; }
+    .fab { width: 50px; height: 50px; font-size: 26px; }
+    .fab.settings svg { width: 20px; height: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="starfield" id="starfield"></div>
+<div class="nebula one"></div>
+<div class="nebula two"></div>
+
+<div class="container">
+  <header>
+    <h1>Читательский дневник</h1>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="books" class="active">Книги</button>
+    <button data-tab="authors">Авторы</button>
+    <button data-tab="stats">Статистика</button>
+  </nav>
+
+  <!-- КНИГИ -->
+  <section id="tab-books" class="tab-content active">
+    <div class="toolbar">
+      <input type="text" id="search" class="search" placeholder="Поиск по названию или автору...">
+      <select id="filter-rating">
+        <option value="">Все оценки</option>
+        <option value="10">10</option>
+        <option value="9">9 и выше</option>
+        <option value="8">8 и выше</option>
+        <option value="7">7 и выше</option>
+        <option value="6">6 и выше</option>
+        <option value="5">5 и ниже</option>
+      </select>
+      <select id="sort-by">
+        <option value="rating-desc" selected>По оценке ↓</option>
+        <option value="rating-asc">По оценке ↑</option>
+        <option value="date-desc">Сначала новые</option>
+        <option value="date-asc">Сначала старые</option>
+        <option value="title">По названию</option>
+        <option value="author">По автору</option>
+      </select>
+      <span class="counter" id="books-counter"></span>
+    </div>
+    <div id="books-container"></div>
+  </section>
+
+  <!-- АВТОРЫ -->
+  <section id="tab-authors" class="tab-content">
+    <div class="toolbar">
+      <input type="text" id="author-search" class="search" placeholder="Поиск по автору...">
+      <select id="author-sort">
+        <option value="avg-desc" selected>По средней ↓</option>
+        <option value="avg-asc">По средней ↑</option>
+        <option value="count-desc">По количеству ↓</option>
+        <option value="median-desc">По медиане ↓</option>
+        <option value="name">По имени</option>
+      </select>
+      <span class="counter" id="authors-counter"></span>
+    </div>
+    <div id="authors-container"></div>
+  </section>
+
+  <!-- СТАТИСТИКА -->
+  <section id="tab-stats" class="tab-content">
+    <div class="stats-summary" id="stats-summary"></div>
+
+    <div class="stats-controls">
+      <label>Год:</label>
+      <select id="year-select"></select>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-header"><h3>Количество книг по месяцам</h3></div>
+      <div class="bar-chart-wrap">
+        <div class="y-labels" id="count-y-labels"></div>
+        <div class="bar-chart" id="monthly-chart"></div>
+      </div>
+      <div class="month-row"><div></div><div class="months" id="count-months"></div></div>
+    </div>
+
+    <div class="chart-section">
+      <div class="chart-header">
+        <h3>Оценки по месяцам</h3>
+        <div class="chart-legend">
+          <span class="item"><span class="swatch-range"></span>мин — макс</span>
+          <span class="item"><span class="swatch-avg"></span>средняя</span>
+        </div>
+      </div>
+      <div class="range-chart-wrap">
+        <div class="y-labels" id="rating-y-labels"></div>
+        <div class="range-cols" id="rating-chart"></div>
+      </div>
+      <div class="month-row"><div></div><div class="months" id="rating-months"></div></div>
+    </div>
+
+    <div class="chart-section">
+      <h3 style="margin-bottom: 20px">По месяцам</h3>
+      <div class="month-tabs" id="month-tabs"></div>
+      <div id="month-detail"></div>
+    </div>
+
+    <div class="chart-section">
+      <h3 style="margin-bottom: 20px">Распределение оценок</h3>
+      <div class="rating-dist" id="rating-dist"></div>
+    </div>
+  </section>
+</div>
+
+<!-- Плавающие кнопки -->
+<div class="fab-stack">
+  <button class="fab settings" id="fab-settings" title="Настройки" aria-label="Настройки">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>
+  </button>
+  <button class="fab" id="fab-add" title="Добавить книгу" aria-label="Добавить книгу">+</button>
+</div>
+
+<!-- Модалка: добавить -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <button class="modal-close-btn" data-close="add-modal">×</button>
+    <h2>Добавить книгу</h2>
+    <form id="add-form">
+      <div class="form-group">
+        <label>Название <span class="req">*</span></label>
+        <input type="text" id="f-title" required>
+      </div>
+      <div class="form-group">
+        <label>Автор <span class="req">*</span></label>
+        <input type="text" id="f-author" required>
+      </div>
+      <div class="form-group">
+        <label>Оценка <span class="req">*</span></label>
+        <div class="rating-box">
+          <div class="rating-display">
+            <span class="num" id="f-rating-num">8,0</span>
+            <span class="out">/ 10</span>
+          </div>
+          <input type="range" id="f-rating" min="1" max="10" step="0.5" value="8">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Месяц прочтения</label>
+        <input type="month" id="f-date">
+        <label class="no-date">
+          <input type="checkbox" id="f-nodate"> не помню / давно читала
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="primary">Добавить</button>
+        <button type="button" class="secondary" data-close="add-modal">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Модалка: редактировать -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <button class="modal-close-btn" data-close="edit-modal">×</button>
+    <h2>Редактировать книгу</h2>
+    <form id="edit-form">
+      <div class="form-group">
+        <label>Название</label>
+        <input type="text" id="e-title" required>
+      </div>
+      <div class="form-group">
+        <label>Автор</label>
+        <input type="text" id="e-author" required>
+      </div>
+      <div class="form-group">
+        <label>Оценка</label>
+        <div class="rating-box">
+          <div class="rating-display">
+            <span class="num" id="e-rating-num">8,0</span>
+            <span class="out">/ 10</span>
+          </div>
+          <input type="range" id="e-rating" min="1" max="10" step="0.5" value="8">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Месяц прочтения</label>
+        <input type="month" id="e-date">
+        <label class="no-date">
+          <input type="checkbox" id="e-nodate"> не помню / давно читала
+        </label>
+      </div>
+      <input type="hidden" id="e-id">
+      <div class="modal-actions">
+        <button type="submit" class="primary">Сохранить</button>
+        <button type="button" class="secondary" data-close="edit-modal">Отмена</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Модалка: настройки -->
+<div class="modal-bg" id="settings-modal">
+  <div class="modal">
+    <button class="modal-close-btn" data-close="settings-modal">×</button>
+    <h2>Настройки</h2>
+
+    <h3 class="section-title">Оформление</h3>
+    <div class="theme-grid" id="theme-grid"></div>
+
+    <h3 class="section-title">Резервное копирование</h3>
+    <p style="color: var(--muted); font-size: 13px; margin-bottom: 12px;">
+      Данные хранятся в браузере. Рекомендуется время от времени сохранять копию в файл.
+    </p>
+    <div class="modal-actions">
+      <button class="secondary" id="btn-export">Скачать копию</button>
+      <button class="secondary" id="btn-import">Загрузить из файла</button>
+      <input type="file" id="import-file" accept=".json" style="display:none">
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ НАЧАЛЬНЫЕ ДАННЫЕ ============ */
+const INITIAL_BOOKS = [
+  { t: "Радиус хрупкости", a: "Ольга Птицева", r: 10, d: "2026-04" },
+  { t: "Сквозь огонь", a: "Евгения Овчинникова", r: 9, d: "2026-04" },
+  { t: "Верховье", a: "Полина Максимова", r: 8.5, d: "2026-04" },
+  { t: "Дегустация", a: "Ксения Буржская", r: 8.5, d: "2026-04" },
+  { t: "Сезон отравленных плодов", a: "Вера Богданова", r: 9, d: "2026-03" },
+  { t: "Несуществующий причал", a: "Нина Дашевская", r: 8.5, d: "2026-03" },
+  { t: "Бабушка сказала сидеть тихо", a: "Настасья Реньжина", r: 8, d: "2026-03" },
+  { t: "До встречи на Сириусе", a: "Нелли Зайцева", r: 8, d: "2026-03" },
+  { t: "Крууга", a: "Анна Лужбина", r: 8, d: "2026-03" },
+  { t: "Теорема тишины", a: "Даша Сиротинская", r: 7.5, d: "2026-03" },
+  { t: "Яблоки и змеи", a: "Мария Ныркова", r: 7, d: "2026-03" },
+  { t: "Укажи мне путь", a: "Стася Мэл", r: 6, d: "2026-03" },
+  { t: "Стены", a: "Кася Кустова", r: 8, d: "2026-02" },
+  { t: "Собака Вера", a: "Евгения Чернышова", r: 8, d: "2026-02" },
+  { t: "Плавучие гнезда", a: "Полина Максимова", r: 7.5, d: "2026-02" },
+  { t: "Тем легче", a: "Анастасия Сопикова", r: 6, d: "2026-02" },
+  { t: "Курорт", a: "Антон Секисов", r: 5, d: "2026-02" },
+  { t: "Комната утешения", a: "Руфь Гринько", r: 9.5, d: "2026-01" },
+  { t: "Конец света, моя любовь", a: "Алла Горбунова", r: 9, d: "2026-01" },
+  { t: "В тихом городе", a: "Мария Дмитриева", r: 8, d: "2026-01" },
+  { t: "Погрязание", a: "Ольга Харитонова", r: 8, d: "2026-01" },
+  { t: "Центр принятия и адаптации", a: "Ольга Дмитриева", r: 7.5, d: "2026-01" },
+  { t: "Сахарная пудра", a: "Маргарита Полонская", r: 7.5, d: "2026-01" },
+  { t: "Я, никогда не знавшая мужчин", a: "Арпман Жаклин", r: 6.5, d: "2026-01" },
+  { t: "Иные", a: "Александра Яковлева", r: 10, d: "" },
+  { t: "Дочери колыбели", a: "Александра Яковлева", r: 10, d: "" },
+  { t: "Самайнтаун", a: "Анастасия Гор", r: 10, d: "" },
+  { t: "Полиция памяти", a: "Ёко Огава", r: 10, d: "" },
+  { t: "Пути сообщения", a: "Ксения Буржская", r: 10, d: "" },
+  { t: "Дом, в котором...", a: "Мариам Петросян", r: 10, d: "" },
+  { t: "Двести третий день зимы", a: "Ольга Птицева", r: 10, d: "" },
+  { t: "Край чудес", a: "Ольга Птицева", r: 10, d: "" },
+  { t: "Весна воды", a: "Ольга Птицева", r: 10, d: "" },
+  { t: "Рассвет жатвы", a: "Сьюзен Коллинз", r: 10, d: "" },
+  { t: "Остров Сахалин", a: "Эдуард Веркин", r: 10, d: "" },
+  { t: "Брат болотного края", a: "Ольга Птицева", r: 9.5, d: "" },
+  { t: "Зайчик и другие рассказы", a: "Дмитрий Мордас", r: 9, d: "" },
+  { t: "Псоглавцы", a: "Алексей Иванов", r: 9, d: "" },
+  { t: "Хтонь в пальто", a: "Ирина Иванова", r: 9, d: "" },
+  { t: "Хтонь в пальто. Какими мы стали", a: "Ирина Иванова", r: 9, d: "" },
+  { t: "Там, где цветет полынь", a: "Ольга Птицева", r: 9, d: "" },
+  { t: "Сестры озерных вод", a: "Ольга Птицева", r: 9, d: "" },
+  { t: "Земля случайных чисел", a: "Татьяна Замировская", r: 9, d: "" },
+  { t: "Шмель", a: "Аня Гетьман", r: 8.5, d: "" },
+  { t: "Ковен озера Шамплейн", a: "Анастасия Гор", r: 8.5, d: "" },
+  { t: "Ковен заблудших ведьм", a: "Анастасия Гор", r: 8.5, d: "" },
+  { t: "Скоро Москва", a: "Анна Шипилова", r: 8.5, d: "" },
+  { t: "Побеги", a: "Ирина Костарева", r: 8.5, d: "" },
+  { t: "Литораль", a: "Ксения Буржская", r: 8.5, d: "" },
+  { t: "Сорока на виселице", a: "Эдуард Веркин", r: 8.5, d: "" },
+  { t: "Южный ветер", a: "Даша Благова", r: 8.5, d: "" },
+  { t: "Опасна для себя и окружающих", a: "Алисса Шайнмел", r: 8, d: "" },
+  { t: "Ковен тысячи костей", a: "Анастасия Гор", r: 8, d: "" },
+  { t: "Раз мальчишка, два мальчишка", a: "Ася Демишкевич", r: 8, d: "" },
+  { t: "Семь способов засолки душ", a: "Вера Богданова", r: 8, d: "" },
+  { t: "Птенчик: сборник рассказов", a: "Дмитрий Мордас", r: 8, d: "" },
+  { t: "Саспыга", a: "Карина Шаинян", r: 8, d: "" },
+  { t: "Бессмертник", a: "Надя Сова", r: 8, d: "" },
+  { t: "Рэм", a: "Ольга Птицева", r: 8, d: "" },
+  { t: "Выйди из шкафа", a: "Ольга Птицева", r: 8, d: "" },
+  { t: "Колдун с Неглинки", a: "Саша Степанова", r: 8, d: "" },
+  { t: "Голод. Нетолстый роман", a: "Светлана Павлова", r: 8, d: "" },
+  { t: "Пятно", a: "Анна Пестерева", r: 8, d: "" },
+  { t: "Сгинь!", a: "Настасья Реньжина", r: 8, d: "" },
+  { t: "Питерские монстры: роман в рассказах", a: "Сорока Вера", r: 8, d: "" },
+  { t: "Салюты на той стороне", a: "Александра Шалашова", r: 8, d: "" },
+  { t: "Дневник погоды (дисторшны)", a: "Алексей Конаков", r: 7.5, d: "" },
+  { t: "Санаторий «Седьмое небо»", a: "Полина Луговцова", r: 7.5, d: "" },
+  { t: "Чужая сторона", a: "Ольга Харитонова", r: 7.5, d: "" },
+  { t: "Смех лисы", a: "Шамиль Идиатуллин", r: 7, d: "" },
+  { t: "Острые", a: "Анна Павлова", r: 7, d: "" },
+  { t: "Плюшевая голова (сборник)", a: "Влад Райбер", r: 7, d: "" },
+  { t: "Словно мы злодеи", a: "М. Л. Рио", r: 7, d: "" },
+  { t: "Его последние дни", a: "Рагим Джафаров", r: 7, d: "" },
+  { t: "Двоедушник", a: "Саша Степанова", r: 7, d: "" },
+  { t: "Город вторых душ", a: "Саша Степанова", r: 7, d: "" },
+  { t: "Баллада о змеях и певчих птицах", a: "Сьюзен Коллинз", r: 7, d: "" },
+  { t: "Самайн у ведьмы пограничья", a: "Уоллис Кинни", r: 7, d: "" },
+  { t: "Уснувшие дети", a: "Энтони Пассерон", r: 7, d: "" },
+  { t: "Бог тревоги", a: "Антон Секисов", r: 6.5, d: "" },
+  { t: "Кадавры", a: "Алексей Поляринов", r: 6, d: "" },
+  { t: "Девочка со спичками", a: "Екатерина Тюхай", r: 6, d: "" },
+  { t: "Лес", a: "Светлана Тюльбашева", r: 6, d: "" },
+  { t: "Бояться поздно", a: "Шамиль Идиатуллин", r: 6, d: "" },
+  { t: "Пирог с крапивой и золой. Настой из памяти и веры", a: "Анна и Марк Коэн", r: 5, d: "" },
+  { t: "Комната Вагинова", a: "Антон Секисов", r: 5, d: "" },
+  { t: "Дом сна", a: "Джонатан Коу", r: 5, d: "" },
+  { t: "Плутон меняет знак", a: "Елена Козлова", r: 5, d: "" },
+  { t: "Йалка", a: "Марина Чуфистова", r: 5, d: "" },
+  { t: "Птица", a: "Ольга Власенко", r: 5, d: "" },
+  { t: "Сато", a: "Рагим Джафаров", r: 5, d: "" },
+  { t: "Болотница", a: "Татьяна Мастрюкова", r: 5, d: "" },
+  { t: "Дом на полпути", a: "Фине Гробёль", r: 5, d: "" },
+  { t: "Нора", a: "Хироко Оямада", r: 5, d: "" },
+  { t: "День города", a: "Надежда Лидваль", r: 4.5, d: "" },
+  { t: "Дневник смерти. Фортуна", a: "Вера Эристави, Ойлин Нокс", r: 4, d: "" },
+  { t: "Опасности путешествий во времени", a: "Джойс Кэрол Оутс", r: 4, d: "" },
+  { t: "Чернила и кровь", a: "Мэй", r: 4, d: "" },
+  { t: "Секция плавания для пьющих в одиночестве", a: "Саша Карин", r: 4, d: "" },
+  { t: "Счастливого дня пробуждения", a: "ParaCosm", r: 3, d: "" }
+];
+
+/* ============ ТЕМЫ ============ */
+const THEMES = [
+  { id: 'cosmos', name: 'Космос', colors: ['#241548', '#d4c4ff', '#9d7bd4', '#e8a8d4'] },
+  { id: 'forest', name: 'Лес',    colors: ['#192a1e', '#d4c26a', '#8dc997', '#c4d8a0'] },
+  { id: 'glitch', name: 'Глитч',  colors: ['#0f1220', '#00e8e8', '#e040b8', '#ffd24a'] }
+];
+const THEME_KEY = 'reading-journal-theme';
+const DEFAULT_THEME = 'cosmos';
+
+function applyTheme(id) {
+  const valid = THEMES.find(t => t.id === id);
+  const theme = valid ? valid.id : DEFAULT_THEME;
+  // убираем все theme-классы
+  document.body.className = document.body.className
+    .split(' ').filter(c => !c.startsWith('theme-')).join(' ').trim();
+  if (theme !== DEFAULT_THEME) document.body.classList.add('theme-' + theme);
+  localStorage.setItem(THEME_KEY, theme);
+  document.querySelectorAll('.theme-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.theme === theme);
+  });
+}
+
+function renderThemeGrid() {
+  const grid = document.getElementById('theme-grid');
+  const current = localStorage.getItem(THEME_KEY) || DEFAULT_THEME;
+  grid.innerHTML = THEMES.map(t => {
+    const preview = t.gradient
+      ? `<div class="theme-preview"><span style="flex:1; background:${t.gradient}"></span></div>`
+      : `<div class="theme-preview">${t.colors.map(c => `<span style="background:${c}"></span>`).join('')}</div>`;
+    return `
+      <button class="theme-card${t.id === current ? ' active' : ''}" data-theme="${t.id}">
+        ${preview}
+        <div class="theme-name">${t.name}</div>
+      </button>
+    `;
+  }).join('');
+  grid.querySelectorAll('.theme-card').forEach(card => {
+    card.addEventListener('click', () => applyTheme(card.dataset.theme));
+  });
+}
+
+// Применяем сохранённую тему сразу
+applyTheme(localStorage.getItem(THEME_KEY) || DEFAULT_THEME);
+
+/* ============ ДАННЫЕ ============ */
+const STORAGE_KEY = 'reading-journal-v2';
+let books = loadBooks();
+
+function loadBooks() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+    const initial = INITIAL_BOOKS.map(b => ({
+      id: uid(), title: b.t, author: b.a, rating: b.r, date: b.d
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+    return initial;
+  } catch { return []; }
+}
+function saveBooks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(books)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+/* ============ ЗВЁЗДЫ ============ */
+(function createStarfield() {
+  const field = document.getElementById('starfield');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 180; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    s.style.width = size + 'px';
+    s.style.height = size + 'px';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDuration = (Math.random() * 4 + 2) + 's';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.opacity = Math.random() * 0.6 + 0.3;
+    frag.appendChild(s);
+  }
+  field.appendChild(frag);
+})();
+
+/* ============ ВКЛАДКИ ============ */
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'stats') renderStats();
+    if (btn.dataset.tab === 'authors') renderAuthors();
+    if (btn.dataset.tab === 'books') renderBooks();
+  });
+});
+
+/* ============ МОДАЛКИ ============ */
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById(btn.dataset.close).classList.remove('active');
+  });
+});
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => {
+    if (e.target === bg) bg.classList.remove('active');
+  });
+});
+
+/* ============ СЛАЙДЕР ============ */
+function setupRatingSlider(inputId, displayId) {
+  const input = document.getElementById(inputId);
+  const display = document.getElementById(displayId);
+  const update = () => { display.textContent = formatRating(parseFloat(input.value)); };
+  input.addEventListener('input', update);
+  update();
+}
+setupRatingSlider('f-rating', 'f-rating-num');
+setupRatingSlider('e-rating', 'e-rating-num');
+
+/* ============ ДОБАВЛЕНИЕ ============ */
+const today = new Date();
+document.getElementById('f-date').value = today.toISOString().slice(0, 7);
+
+document.getElementById('fab-add').addEventListener('click', () => {
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-author').value = '';
+  document.getElementById('f-rating').value = 8;
+  document.getElementById('f-rating-num').textContent = '8,0';
+  document.getElementById('f-date').value = today.toISOString().slice(0, 7);
+  document.getElementById('f-date').disabled = false;
+  document.getElementById('f-nodate').checked = false;
+  document.getElementById('add-modal').classList.add('active');
+  setTimeout(() => document.getElementById('f-title').focus(), 100);
+});
+
+document.getElementById('fab-settings').addEventListener('click', () => {
+  renderThemeGrid();
+  document.getElementById('settings-modal').classList.add('active');
+});
+
+document.getElementById('f-nodate').addEventListener('change', e => {
+  document.getElementById('f-date').disabled = e.target.checked;
+  if (e.target.checked) document.getElementById('f-date').value = '';
+  else document.getElementById('f-date').value = today.toISOString().slice(0, 7);
+});
+
+document.getElementById('add-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const noDate = document.getElementById('f-nodate').checked;
+  const book = {
+    id: uid(),
+    title: document.getElementById('f-title').value.trim(),
+    author: document.getElementById('f-author').value.trim(),
+    rating: parseFloat(document.getElementById('f-rating').value),
+    date: noDate ? '' : document.getElementById('f-date').value
+  };
+  books.push(book);
+  saveBooks();
+  document.getElementById('add-modal').classList.remove('active');
+  renderBooks();
+  toast('Книга добавлена ✦');
+});
+
+/* ============ КНИГИ ============ */
+const searchInput = document.getElementById('search');
+const filterRating = document.getElementById('filter-rating');
+const sortBy = document.getElementById('sort-by');
+[searchInput, filterRating, sortBy].forEach(el => el.addEventListener('input', renderBooks));
+
+function renderBooks() {
+  const container = document.getElementById('books-container');
+  const counter = document.getElementById('books-counter');
+  const q = searchInput.value.trim().toLowerCase();
+  const r = filterRating.value;
+  let list = books.slice();
+
+  if (q) list = list.filter(b =>
+    b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)
+  );
+  if (r) {
+    const rv = parseFloat(r);
+    if (rv === 5) list = list.filter(b => b.rating <= 5);
+    else if (rv === 10) list = list.filter(b => b.rating === 10);
+    else list = list.filter(b => b.rating >= rv);
+  }
+
+  const sort = sortBy.value;
+  list.sort((a, b) => {
+    if (sort === 'date-desc' || sort === 'date-asc') {
+      const aEmpty = !a.date, bEmpty = !b.date;
+      if (aEmpty && !bEmpty) return 1;
+      if (!aEmpty && bEmpty) return -1;
+      if (aEmpty && bEmpty) return 0;
+      return sort === 'date-desc' ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+    }
+    if (sort === 'rating-desc') return b.rating - a.rating || a.title.localeCompare(b.title, 'ru');
+    if (sort === 'rating-asc') return a.rating - b.rating || a.title.localeCompare(b.title, 'ru');
+    if (sort === 'title') return a.title.localeCompare(b.title, 'ru');
+    if (sort === 'author') return a.author.localeCompare(b.author, 'ru');
+    return 0;
+  });
+
+  counter.textContent = list.length === books.length
+    ? `${books.length} ${plural(books.length, 'книга', 'книги', 'книг')}`
+    : `${list.length} из ${books.length}`;
+
+  if (list.length === 0) {
+    container.innerHTML = books.length === 0
+      ? `<div class="empty-state"><h3>Тут пока пусто</h3><p>Нажмите на «+» в углу, чтобы добавить первую книгу</p></div>`
+      : `<div class="empty-state"><h3>Ничего не найдено</h3><p>Попробуйте изменить фильтры</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Автор</th>
+            <th class="num">Оценка</th>
+            <th>Дата</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(b => `
+            <tr>
+              <td class="title">${escapeHtml(b.title)}</td>
+              <td class="author">${escapeHtml(b.author)}</td>
+              <td class="rating">${formatRating(b.rating)}</td>
+              <td class="date">${b.date ? formatMonthShort(b.date) : '—'}</td>
+              <td class="actions">
+                <button onclick="openEdit('${b.id}')">Изм.</button>
+                <button class="del" onclick="deleteBook('${b.id}')">×</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function deleteBook(id) {
+  const book = books.find(b => b.id === id);
+  if (!book) return;
+  if (!confirm(`Удалить «${book.title}»?`)) return;
+  books = books.filter(b => b.id !== id);
+  saveBooks();
+  renderBooks();
+  toast('Книга удалена');
+}
+
+function openEdit(id) {
+  const b = books.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('e-id').value = b.id;
+  document.getElementById('e-title').value = b.title;
+  document.getElementById('e-author').value = b.author;
+  document.getElementById('e-rating').value = b.rating;
+  document.getElementById('e-rating-num').textContent = formatRating(b.rating);
+  document.getElementById('e-date').value = b.date || '';
+  document.getElementById('e-nodate').checked = !b.date;
+  document.getElementById('e-date').disabled = !b.date;
+  document.getElementById('edit-modal').classList.add('active');
+}
+
+document.getElementById('e-nodate').addEventListener('change', e => {
+  document.getElementById('e-date').disabled = e.target.checked;
+  if (e.target.checked) document.getElementById('e-date').value = '';
+});
+
+document.getElementById('edit-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const id = document.getElementById('e-id').value;
+  const book = books.find(x => x.id === id);
+  if (!book) return;
+  const noDate = document.getElementById('e-nodate').checked;
+  book.title = document.getElementById('e-title').value.trim();
+  book.author = document.getElementById('e-author').value.trim();
+  book.rating = parseFloat(document.getElementById('e-rating').value);
+  book.date = noDate ? '' : document.getElementById('e-date').value;
+  saveBooks();
+  document.getElementById('edit-modal').classList.remove('active');
+  renderBooks();
+  toast('Изменения сохранены');
+});
+
+/* ============ АВТОРЫ ============ */
+const authorSearch = document.getElementById('author-search');
+const authorSort = document.getElementById('author-sort');
+[authorSearch, authorSort].forEach(el => el.addEventListener('input', renderAuthors));
+
+function median(arr) {
+  const s = arr.slice().sort((a, b) => a - b);
+  const n = s.length;
+  if (n === 0) return 0;
+  if (n % 2 === 1) return s[(n - 1) / 2];
+  return (s[n / 2 - 1] + s[n / 2]) / 2;
+}
+
+function renderAuthors() {
+  const container = document.getElementById('authors-container');
+  const counter = document.getElementById('authors-counter');
+
+  const map = {};
+  books.forEach(b => {
+    const key = b.author.trim();
+    if (!key) return;
+    if (!map[key]) map[key] = [];
+    map[key].push(b.rating);
+  });
+  let authors = Object.entries(map).map(([name, rs]) => ({
+    name,
+    count: rs.length,
+    avg: rs.reduce((s, v) => s + v, 0) / rs.length,
+    median: median(rs),
+    min: Math.min(...rs),
+    max: Math.max(...rs)
+  }));
+
+  const q = authorSearch.value.trim().toLowerCase();
+  if (q) authors = authors.filter(a => a.name.toLowerCase().includes(q));
+
+  const sort = authorSort.value;
+  authors.sort((a, b) => {
+    if (sort === 'avg-desc') return b.avg - a.avg || b.count - a.count || a.name.localeCompare(b.name, 'ru');
+    if (sort === 'avg-asc') return a.avg - b.avg || a.name.localeCompare(b.name, 'ru');
+    if (sort === 'count-desc') return b.count - a.count || b.avg - a.avg || a.name.localeCompare(b.name, 'ru');
+    if (sort === 'median-desc') return b.median - a.median || b.avg - a.avg || a.name.localeCompare(b.name, 'ru');
+    if (sort === 'name') return a.name.localeCompare(b.name, 'ru');
+    return 0;
+  });
+
+  const total = Object.keys(map).length;
+  counter.textContent = authors.length === total
+    ? `${total} ${plural(total, 'автор', 'автора', 'авторов')}`
+    : `${authors.length} из ${total}`;
+
+  if (authors.length === 0) {
+    container.innerHTML = `<div class="empty-state"><h3>Ничего не найдено</h3></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Автор</th>
+            <th class="num">Книг</th>
+            <th class="num">Средняя</th>
+            <th class="num">Медиана</th>
+            <th class="num">Мин</th>
+            <th class="num">Макс</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${authors.map(a => `
+            <tr>
+              <td class="title">${escapeHtml(a.name)}</td>
+              <td class="num">${a.count}</td>
+              <td class="rating">${formatRating(a.avg)}</td>
+              <td class="rating">${formatRating(a.median)}</td>
+              <td class="rating">${formatRating(a.min)}</td>
+              <td class="rating">${formatRating(a.max)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ============ СТАТИСТИКА ============ */
+let currentMonthTab = null;
+const MONTHS_SHORT = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const MONTHS_FULL = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
+function renderStats() {
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+  const curYM = `${curYear}-${curMonth}`;
+
+  const total = books.length;
+  const dated = books.filter(b => b.date);
+  const thisYear = dated.filter(b => b.date.startsWith(curYear + '')).length;
+  const thisMonth = dated.filter(b => b.date === curYM).length;
+  const avg = total ? (books.reduce((s, b) => s + b.rating, 0) / total) : 0;
+
+  document.getElementById('stats-summary').innerHTML = `
+    <div class="stat-card"><span class="value">${total}</span><div class="label">Всего</div></div>
+    <div class="stat-card"><span class="value">${thisYear}</span><div class="label">В ${curYear} году</div></div>
+    <div class="stat-card"><span class="value">${thisMonth}</span><div class="label">В этом месяце</div></div>
+    <div class="stat-card"><span class="value">${total ? formatRating(avg) : '—'}</span><div class="label">Средняя оценка</div></div>
+  `;
+
+  const years = [...new Set(dated.map(b => b.date.slice(0, 4)))].sort((a, b) => b.localeCompare(a));
+  if (!years.includes(curYear + '')) years.unshift(curYear + '');
+  const yearSel = document.getElementById('year-select');
+  const prev = yearSel.value || (years.includes(curYear + '') ? curYear + '' : years[0]);
+  yearSel.innerHTML = years.map(y => `<option value="${y}" ${y === prev ? 'selected' : ''}>${y}</option>`).join('');
+
+  if (!currentMonthTab) currentMonthTab = curYM;
+
+  renderMonthlyChart();
+  renderRangeChart();
+  renderMonthTabs();
+  renderMonthDetail();
+
+  yearSel.onchange = () => {
+    const prevMonth = currentMonthTab ? currentMonthTab.slice(5) : curMonth;
+    currentMonthTab = `${yearSel.value}-${prevMonth}`;
+    renderMonthlyChart();
+    renderRangeChart();
+    renderMonthTabs();
+    renderMonthDetail();
+  };
+
+  // Распределение — шаг 0,5
+  const buckets = {};
+  for (let v = 1; v <= 10; v += 0.5) buckets[v.toFixed(1)] = 0;
+  books.forEach(b => {
+    const key = (Math.round(b.rating * 2) / 2).toFixed(1);
+    if (buckets[key] != null) buckets[key]++;
+  });
+  const maxB = Math.max(...Object.values(buckets), 1);
+  const rows = [];
+  for (let v = 10; v >= 1; v -= 0.5) {
+    const key = v.toFixed(1);
+    const count = buckets[key];
+    const pct = (count / maxB) * 100;
+    const isHalf = (v * 2) % 2 !== 0;
+    rows.push(`
+      <div class="rating-row"${isHalf ? ' style="opacity:0.85"' : ''}>
+        <span class="label-num">${formatRating(v)}</span>
+        <div class="rating-bar-bg"><div class="rating-bar-fill-dist" style="width:${pct}%"></div></div>
+        <span class="count">${count}</span>
+      </div>
+    `);
+  }
+  document.getElementById('rating-dist').innerHTML = rows.join('');
+
+  document.getElementById('rating-y-labels').innerHTML = `
+    <span style="top:0%">10</span>
+    <span style="top:22.2%">8</span>
+    <span style="top:44.4%">6</span>
+    <span style="top:66.7%">4</span>
+    <span style="top:88.9%">2</span>
+  `;
+}
+
+function renderMonthlyChart() {
+  const year = document.getElementById('year-select').value;
+  const counts = Array(12).fill(0);
+  books.forEach(b => {
+    if (b.date && b.date.startsWith(year)) {
+      const m = parseInt(b.date.slice(5, 7));
+      if (m >= 1 && m <= 12) counts[m - 1]++;
+    }
+  });
+  const max = Math.max(...counts, 1);
+  const niceMax = Math.max(Math.ceil(max), 2);
+  document.getElementById('count-y-labels').innerHTML = `
+    <span style="top:0%">${niceMax}</span>
+    <span style="top:50%">${(niceMax / 2).toFixed(niceMax % 2 ? 1 : 0).replace('.', ',')}</span>
+    <span style="top:100%">0</span>
+  `;
+  document.getElementById('monthly-chart').innerHTML = counts.map((c, i) => {
+    const h = (c / niceMax) * 100;
+    const clickable = c > 0;
+    return `
+      <div class="bar-col${clickable ? ' clickable' : ''}" ${clickable ? `onclick="goToMonthTab('${year}', ${i})"` : ''}>
+        <div class="bar" style="height:${h}%">
+          ${c > 0 ? `<span class="bar-value">${c}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('count-months').innerHTML = MONTHS_SHORT.map((m, i) => {
+    const clickable = counts[i] > 0;
+    return `<span${clickable ? ` class="clickable" onclick="goToMonthTab('${year}', ${i})"` : ''}>${m}</span>`;
+  }).join('');
+}
+
+function renderRangeChart() {
+  const year = document.getElementById('year-select').value;
+  const perMonth = Array.from({ length: 12 }, () => []);
+  books.forEach(b => {
+    if (b.date && b.date.startsWith(year)) {
+      const m = parseInt(b.date.slice(5, 7));
+      if (m >= 1 && m <= 12) perMonth[m - 1].push(b.rating);
+    }
+  });
+  const pctTop = v => ((10 - v) / 9) * 100;
+
+  document.getElementById('rating-chart').innerHTML = perMonth.map((ratings, i) => {
+    if (ratings.length === 0) return `<div class="range-col"></div>`;
+    const min = Math.min(...ratings);
+    const max = Math.max(...ratings);
+    const avg = ratings.reduce((s, v) => s + v, 0) / ratings.length;
+    const top = pctTop(max);
+    const bot = 100 - pctTop(min);
+    const avgTop = pctTop(avg);
+    const tooltip = `${MONTHS_FULL[i]}: средняя ${formatRating(avg)} · мин ${formatRating(min)} · макс ${formatRating(max)}`;
+    return `
+      <div class="range-col clickable" title="${escapeHtml(tooltip)}" onclick="goToMonthTab('${year}', ${i})">
+        <div class="rc-range" style="top:${top}%; bottom:${bot}%"></div>
+        <div class="rc-avg" style="top:${avgTop}%">
+          <span class="rc-avg-label">ср ${formatRating(avg)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('rating-months').innerHTML = MONTHS_SHORT.map((m, i) => {
+    const clickable = perMonth[i].length > 0;
+    return `<span${clickable ? ` class="clickable" onclick="goToMonthTab('${year}', ${i})"` : ''}>${m}</span>`;
+  }).join('');
+}
+
+function goToMonthTab(year, monthIdx) {
+  const ym = `${year}-${String(monthIdx + 1).padStart(2, '0')}`;
+  const yearSel = document.getElementById('year-select');
+  if (yearSel.value !== year) {
+    yearSel.value = year;
+    renderMonthlyChart();
+    renderRangeChart();
+  }
+  currentMonthTab = ym;
+  renderMonthTabs();
+  renderMonthDetail();
+  document.getElementById('month-tabs').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function setMonthTab(ym) {
+  currentMonthTab = ym;
+  renderMonthTabs();
+  renderMonthDetail();
+}
+
+function renderMonthTabs() {
+  const yearSel = document.getElementById('year-select');
+  const year = yearSel.value;
+  if (!currentMonthTab || !currentMonthTab.startsWith(year)) {
+    const monthPart = currentMonthTab ? currentMonthTab.slice(5) : String(new Date().getMonth() + 1).padStart(2, '0');
+    currentMonthTab = `${year}-${monthPart}`;
+  }
+  const counts = Array(12).fill(0);
+  books.forEach(b => {
+    if (b.date && b.date.startsWith(year)) {
+      const m = parseInt(b.date.slice(5, 7));
+      if (m >= 1 && m <= 12) counts[m - 1]++;
+    }
+  });
+  document.getElementById('month-tabs').innerHTML = MONTHS_SHORT.map((name, i) => {
+    const ym = `${year}-${String(i + 1).padStart(2, '0')}`;
+    const isActive = ym === currentMonthTab;
+    const isEmpty = counts[i] === 0;
+    const classes = [];
+    if (isActive) classes.push('active');
+    if (isEmpty) classes.push('empty');
+    return `<button class="${classes.join(' ')}" onclick="setMonthTab('${ym}')">
+      <span class="mt-name">${name}</span>
+      ${counts[i] > 0 ? `<span class="mt-count">${counts[i]}</span>` : ''}
+    </button>`;
+  }).join('');
+}
+
+function renderMonthDetail() {
+  const el = document.getElementById('month-detail');
+  if (!currentMonthTab) { el.innerHTML = ''; return; }
+  const [y, m] = currentMonthTab.split('-');
+  const monthIdx = parseInt(m) - 1;
+  const monthBooks = books.filter(b => b.date === currentMonthTab).sort((a, b) => b.rating - a.rating);
+  const title = `${MONTHS_FULL[monthIdx]} ${y}`;
+
+  if (monthBooks.length === 0) {
+    el.innerHTML = `
+      <h4 class="md-title">${title}</h4>
+      <div class="empty-inline">В этом месяце пока ничего не прочитано</div>
+    `;
+    return;
+  }
+
+  const ratings = monthBooks.map(b => b.rating);
+  const min = Math.min(...ratings);
+  const max = Math.max(...ratings);
+  const avg = ratings.reduce((s, v) => s + v, 0) / ratings.length;
+  const med = median(ratings);
+
+  el.innerHTML = `
+    <h4 class="md-title">${title}</h4>
+    <div class="month-stats">
+      <div class="stat"><div class="v">${monthBooks.length}</div><div class="l">Книг</div></div>
+      <div class="stat"><div class="v">${formatRating(avg)}</div><div class="l">Средняя</div></div>
+      <div class="stat"><div class="v">${formatRating(med)}</div><div class="l">Медиана</div></div>
+      <div class="stat"><div class="v">${formatRating(min)}</div><div class="l">Минимум</div></div>
+      <div class="stat"><div class="v">${formatRating(max)}</div><div class="l">Максимум</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Автор</th>
+            <th class="num">Оценка</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${monthBooks.map(b => `
+            <tr>
+              <td class="title">${escapeHtml(b.title)}</td>
+              <td class="author">${escapeHtml(b.author)}</td>
+              <td class="rating">${formatRating(b.rating)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* ============ ЭКСПОРТ / ИМПОРТ ============ */
+document.getElementById('btn-export').addEventListener('click', () => {
+  const data = JSON.stringify(books, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `дневник-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Копия сохранена');
+});
+
+document.getElementById('btn-import').addEventListener('click', () => {
+  document.getElementById('import-file').click();
+});
+document.getElementById('import-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('bad format');
+      if (!confirm(`Загрузить ${data.length} ${plural(data.length, 'книгу', 'книги', 'книг')}? Текущие данные будут заменены.`)) return;
+      books = data.map(b => ({
+        ...b,
+        date: b.date && /^\d{4}-\d{2}-\d{2}$/.test(b.date) ? b.date.slice(0, 7) : (b.date || '')
+      }));
+      saveBooks();
+      renderBooks();
+      document.getElementById('settings-modal').classList.remove('active');
+      toast('Данные загружены');
+    } catch {
+      toast('Не удалось прочитать файл');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+/* ============ УТИЛИТЫ ============ */
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function formatRating(n) {
+  if (n == null) return '—';
+  const rounded = Math.round(n * 10) / 10;
+  return rounded.toFixed(1).replace('.', ',');
+}
+function formatMonthShort(ym) {
+  if (!ym) return '';
+  const [y, m] = ym.split('-');
+  return `${MONTHS_SHORT[parseInt(m) - 1]} ${y}`;
+}
+function plural(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+let toastTimeout;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ============ СТАРТ ============ */
+renderBooks();
+</script>
+</body>
+</html>
