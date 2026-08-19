@@ -2632,26 +2632,26 @@ function storyDecor(ctx, W, H, winter) {
   const cls = document.body.classList;
   // весной и летом картинка без украшений на фоне
   if (cls.contains('theme-spring') || cls.contains('theme-summer')) return;
+  // положение по вертикали задаём долей высоты — тогда декор одинаково
+  // ложится и на длинную сторис, и на более короткое фото 10×15
   if (winter) {
     const cols = ['#dff2ff', '#a9dcf5', '#ffffff', '#bfe6f5'];
     const flakes = [
-      [95, 250, 30, -0.3], [995, 350, 24, 0.5], [140, 1690, 27, 0.2],
-      [960, 1780, 32, -0.6], [1010, 900, 20, 0.4], [70, 1150, 18, -0.9],
-      [520, 1850, 16, 0.1], [880, 130, 18, 0.7]
+      [95, 0.13, 30, -0.3], [995, 0.18, 24, 0.5], [140, 0.88, 27, 0.2],
+      [960, 0.93, 32, -0.6], [1010, 0.47, 20, 0.4], [70, 0.60, 18, -0.9],
+      [520, 0.96, 16, 0.1], [880, 0.07, 18, 0.7]
     ];
-    flakes.forEach(([fx, fy, fs, fr], i) => storyFlake(ctx, fx, fy, fs, fr, cols[i % cols.length], 0.3));
+    flakes.forEach(([fx, fy, fs, fr], i) => storyFlake(ctx, fx, fy * H, fs, fr, cols[i % cols.length], 0.3));
   } else {
     const cols = ['#e8616f', '#ffa64d', '#8fa85c', '#d67a1f'];
     const leaves = [
-      [95, 250, 46, -0.5], [995, 330, 38, 0.7], [140, 1760, 42, 0.3],
-      [960, 1700, 50, -0.8], [1010, 980, 30, 0.2], [70, 1180, 26, -1.1]
+      [95, 0.13, 46, -0.5], [995, 0.17, 38, 0.7], [140, 0.92, 42, 0.3],
+      [960, 0.89, 50, -0.8], [1010, 0.51, 30, 0.2], [70, 0.61, 26, -1.1]
     ];
-    leaves.forEach(([lx, ly, ls, lr], i) => storyLeaf(ctx, lx, ly, ls, lr, cols[i % cols.length], 0.2));
+    leaves.forEach(([lx, ly, ls, lr], i) => storyLeaf(ctx, lx, ly * H, ls, lr, cols[i % cols.length], 0.2));
   }
 }
 
-/* Раскладка списка: названия переносим по словам и показываем целиком.
-   Возвращает страницы — если всё не помещается, получится серия картинок. */
 function layoutStoryPages(ctx, list, fam, innerW, availH, noRating) {
   /* Один и тот же кегль на всех картинках, независимо от числа книг —
      так экспорт за разные месяцы выглядит одинаково. Если список не влезает,
@@ -2694,8 +2694,12 @@ function layoutStoryPages(ctx, list, fam, innerW, availH, noRating) {
    просто увеличиваем масштаб — так одна и та же вёрстка годится для обоих. */
 const STORY_W = 1080, STORY_PAD = 96;
 const EXPORT_FORMATS = {
-  story: { name: 'Для сторис', hint: '1080 × 1920, вертикально', h: 1920, scale: 1,     light: false, decor: true },
-  print: { name: 'Для печати', hint: '10 × 15 см, 300 dpi',      h: 1620, scale: 1.0936, light: true,  decor: false }
+  story: { name: 'для сторис в стиле темы',        hint: '1080 × 1920',
+           h: 1920, scale: 1,      light: false, mono: false, decor: true,  suffix: '' },
+  photo: { name: 'для печати в стиле темы (10х15)', hint: '1181 × 1772, 300 dpi',
+           h: 1620, scale: 1.0936, light: false, mono: false, decor: true,  suffix: '-фото' },
+  bw:    { name: 'для печати на чб принтере (A5)',  hint: '1748 × 2480, 300 dpi',
+           h: 1532, scale: 1.6185, light: true,  mono: true,  decor: false, suffix: '-чб' }
 };
 let STORY_H = EXPORT_FORMATS.story.h;
 let exportFormat = 'story';
@@ -2714,14 +2718,15 @@ async function storyReady() {
   const primRgb = hexToRgb(cPrimary).join(', ');
 
   if (F.light) {
-    // Печать: белый лист, тёмный текст, никакого фонового декора
-    const ink = darkenForPaper(`rgb(${primRgb})`);
+    // Печать: белый лист, тёмный текст, никакого фонового декора.
+    // В чёрно-белом варианте цвет заголовка тоже уходит в серый.
+    const accent = F.mono ? '#1a1a1a' : darkenForPaper(`rgb(${primRgb})`);
     return {
       F, fam,
       text: '#141414', dim: '#3a3a3a', muted: '#6b6b6b',
-      primary: ink, primRgb,
+      primary: accent, primRgb,
       border: 'rgba(0, 0, 0, 0.30)', sep: 'rgba(0, 0, 0, 0.14)',
-      marker: '#141414', paper: true, winter: false, ink: inkStrokeEm()
+      marker: '#141414', paper: true, mono: F.mono, winter: false, ink: inkStrokeEm()
     };
   }
   return {
@@ -2734,6 +2739,7 @@ async function storyReady() {
     sep: `rgba(${primRgb}, 0.13)`,
     marker: cssVar('--marker') || '#ffffff',
     paper: false,
+    mono: false,
     ink: inkStrokeEm(),
     winter: document.body.classList.contains('theme-winter')
   };
@@ -2771,13 +2777,29 @@ function darkenForPaper(rgb) {
   return 'rgb(30, 30, 30)';
 }
 
-/* Цвета шкалы: на бумаге те же оттенки, но достаточно тёмные */
+/* Цвета шкалы в экспорте.
+   На бумаге — те же оттенки, но достаточно тёмные.
+   На чёрно-белом принтере — серая шкала: чем больше значение, тем темнее. */
+function gray(v) { const n = Math.round(v); return `rgb(${n}, ${n}, ${n})`; }
+
 function exportScaleColor(t, S) {
+  t = Math.max(0, Math.min(1, t));
+  if (S.mono) return gray(115 - 92 * t);          // подписи и контуры: 115 → 23
   const c = scaleColor(t, true);
   return S.paper ? darkenForPaper(c) : c;
 }
 function exportRatingColor(v, S) {
   return exportScaleColor((v - 5) / 5, S);
+}
+
+/* Заливка полос: на экране и фото — цвет темы, на чб — светло-серая шкала */
+function exportFillColor(t, S) {
+  t = Math.max(0, Math.min(1, t));
+  if (S.mono) return gray(205 - 110 * t);         // заливка: 205 → 95
+  return scaleColor(t);
+}
+function exportRatingFill(v, S) {
+  return exportFillColor((v - 5) / 5, S);
 }
 
 function storyCanvas(S) {
@@ -2861,7 +2883,7 @@ function downloadCanvases(canvases, baseName) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        const suffix = exportFormat === 'print' ? '-печать' : '';
+        const suffix = EXPORT_FORMATS[exportFormat].suffix;
         a.download = canvases.length > 1
           ? `${baseName}${suffix}-${i + 1}.png`
           : `${baseName}${suffix}.png`;
@@ -3011,7 +3033,7 @@ async function renderCountChartStory() {
       ctx.fillRect(trackX, cy - barH / 2, trackW, barH);
       if (c > 0) {
         const w = Math.max(barH * 0.5, (c / max) * trackW);
-        ctx.fillStyle = scaleColor(t);
+        ctx.fillStyle = exportFillColor(t, S);
         ctx.fillRect(trackX, cy - barH / 2, w, barH);
         ctx.strokeStyle = exportScaleColor(t, S);
         ctx.lineWidth = 1.5;
@@ -3065,7 +3087,7 @@ async function renderRatingChartStory() {
       const avg = rs.reduce((a, v) => a + v, 0) / rs.length;
       const x1 = posOf(mn), x2 = posOf(mx);
       const w = Math.max(barH * 0.4, x2 - x1);
-      ctx.fillStyle = ratingColor(avg);
+      ctx.fillStyle = exportRatingFill(avg, S);
       ctx.fillRect(x1, cy - barH / 2, w, barH);
       ctx.strokeStyle = exportRatingColor(avg, S);
       ctx.lineWidth = 1.5;
